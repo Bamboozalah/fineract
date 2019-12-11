@@ -21,6 +21,8 @@ RUN mkdir fineract
 COPY . fineract
 
 WORKDIR fineract
+
+ADD ./app/ /fineract-provider/apps
 RUN ./gradlew clean -x rat -x test war
 
 # =========================================
@@ -33,11 +35,6 @@ USER root
 RUN apt-get update -qq && apt-get install -y wget
 
 COPY --from=builder /fineract/build/libs/fineract-provider.war /opt/bitnami/tomcat/webapps
-
-ADD ./app/ /opt/bitnami/tomcat/webapps/app
-
-ADD ./test/ /opt/bitnami/tomcat/webapps/test/ 
-RUN ls -lrt /opt/bitnami/tomcat/webapps
 
 RUN keytool -genkey -keyalg RSA -alias tomcat -keystore /opt/bitnami/tomcat/tomcat.keystore -keypass xyz123 -storepass xyz123 -noprompt -dname "CN=Fineract, OU=Fineract, O=Fineract, L=Unknown, ST=Unknown, C=Unknown"
 COPY ./docker/server.xml /opt/bitnami/tomcat/conf
